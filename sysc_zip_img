@@ -1,0 +1,29 @@
+/**
+ * 异步执行PHP 方法
+ * @param $self  /index.php/Home/Index/index
+ * @param $query ?path=path
+ */
+function sysc($self,$query){
+    $host=$_SERVER['HTTP_HOST'];
+    $fp=fsockopen($host,80,$errno,$errstr,600);
+    if($fp){
+        $out = "GET ".$self.$query."  HTTP/1.1\r\n";
+        $out.="Host: ".$host."\r\n";
+        $out.="Connection: Close\r\n\r\n";
+        fwrite($fp,$out);
+    }
+    fclose($fp);
+}
+
+
+ /**
+ * 配合图片压缩类压缩图片
+ * @param $path 图片路径
+ */
+public function zip_img(){
+    $path=$_POST['path'];
+    require_once 'image_zip.php';
+    $req=new imgcompress($path,0.5);//图片压缩类
+    $result=$req->compressImg($path);//保存图片
+    return $result;
+}
