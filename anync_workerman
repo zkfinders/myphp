@@ -1,0 +1,56 @@
+<?php
+/**
+ * 基于workerman 的异步
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2018/10/16 0016
+ * Time: 15:31
+ */
+
+/**
+ * tp 请求开启workerman：php index.php 模块名/控制器名/[方法名]
+ */
+
+use \Workerman\Connection\AsyncTcpConnection;
+
+class Async{
+
+    /**
+     * 创建服务端
+     * Async constructor.
+     */
+    public function __construct()
+    {
+        $work= new Worker('Text://0.0.0.0:12345');
+        $work->count = 80;
+        $work->name = 'MailWorker';
+        $work->onMessage=function($connection, $mail_data){
+            //异步执行方法
+            async_fun();
+            $connection->send('ok');
+        };
+        Worker::runAll();
+    }
+
+
+    //异步执行操作
+    function async_fun(){
+        //模拟进程阻塞
+        sleep(100);
+    }
+
+    /**
+     * 发起异步请求
+     */
+    function post_async(){
+        $socket = stream_socket_client("tcp://127.0.0.1:12345", $errno, $errmsg, 5);
+        //请求数据
+        $mail_data = array("from"=>"...", "to"=>"...", "content"=>"...");
+        $mail_buffer = json_encode($mail_data)."\n";
+        //写入文件流
+        fwrite($socket, $mail_buffer);
+        //继续执行
+        echo 'ok';
+    }
+
+}
